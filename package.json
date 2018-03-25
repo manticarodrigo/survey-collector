@@ -1,5 +1,5 @@
 {
-  "name": "nps-collector",
+  "name": "apollo-nps-collector",
   "version": "1.0.0",
   "devDependencies": {
     "react-scripts": "1.1.1"

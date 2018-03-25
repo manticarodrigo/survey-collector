@@ -5,11 +5,22 @@
 # Model Types
 #
 
-type Post implements Node {
+type Survey implements Node {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  text: String!
+  description: String!
+  endDate: DateTime
+  votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote!]
+}
+
+type Vote implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  survey(where: SurveyWhereInput): Survey!
 }
 
 
@@ -17,7 +28,11 @@ type Post implements Node {
 # Other Types
 #
 
-type AggregatePost {
+type AggregateSurvey {
+  count: Int!
+}
+
+type AggregateVote {
   count: Int!
 }
 
@@ -28,6 +43,8 @@ type BatchPayload {
   count: Long!
 }
 
+scalar DateTime
+
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
 Long can represent values between -(2^63) and 2^63 - 1.
@@ -35,12 +52,18 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createPost(data: PostCreateInput!): Post!
-  updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
-  deletePost(where: PostWhereUniqueInput!): Post
-  upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
-  updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
-  deleteManyPosts(where: PostWhereInput!): BatchPayload!
+  createSurvey(data: SurveyCreateInput!): Survey!
+  createVote(data: VoteCreateInput!): Vote!
+  updateSurvey(data: SurveyUpdateInput!, where: SurveyWhereUniqueInput!): Survey
+  updateVote(data: VoteUpdateInput!, where: VoteWhereUniqueInput!): Vote
+  deleteSurvey(where: SurveyWhereUniqueInput!): Survey
+  deleteVote(where: VoteWhereUniqueInput!): Vote
+  upsertSurvey(where: SurveyWhereUniqueInput!, create: SurveyCreateInput!, update: SurveyUpdateInput!): Survey!
+  upsertVote(where: VoteWhereUniqueInput!, create: VoteCreateInput!, update: VoteUpdateInput!): Vote!
+  updateManySurveys(data: SurveyUpdateInput!, where: SurveyWhereInput!): BatchPayload!
+  updateManyVotes(data: VoteUpdateInput!, where: VoteWhereInput!): BatchPayload!
+  deleteManySurveys(where: SurveyWhereInput!): BatchPayload!
+  deleteManyVotes(where: VoteWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -81,10 +104,31 @@ type PageInfo {
   endCursor: String
 }
 
+type Query {
+  surveys(where: SurveyWhereInput, orderBy: SurveyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Survey]!
+  votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote]!
+  survey(where: SurveyWhereUniqueInput!): Survey
+  vote(where: VoteWhereUniqueInput!): Vote
+  surveysConnection(where: SurveyWhereInput, orderBy: SurveyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SurveyConnection!
+  votesConnection(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VoteConnection!
+  """
+  Fetches an object given its ID
+  """
+  node("""
+  The ID of an object
+  """
+  id: ID!): Node
+}
+
+type Subscription {
+  survey(where: SurveySubscriptionWhereInput): SurveySubscriptionPayload
+  vote(where: VoteSubscriptionWhereInput): VoteSubscriptionPayload
+}
+
 """
 A connection to a list of items.
 """
-type PostConnection {
+type SurveyConnection {
   """
   Information to aid in pagination.
   """
@@ -92,68 +136,87 @@ type PostConnection {
   """
   A list of edges.
   """
-  edges: [PostEdge]!
-  aggregate: AggregatePost!
+  edges: [SurveyEdge]!
+  aggregate: AggregateSurvey!
 }
 
-input PostCreateInput {
+input SurveyCreateInput {
   isPublished: Boolean!
   title: String!
-  text: String!
+  description: String!
+  endDate: DateTime
+  votes: VoteCreateManyWithoutSurveyInput
+}
+
+input SurveyCreateOneWithoutVotesInput {
+  create: SurveyCreateWithoutVotesInput
+  connect: SurveyWhereUniqueInput
+}
+
+input SurveyCreateWithoutVotesInput {
+  isPublished: Boolean!
+  title: String!
+  description: String!
+  endDate: DateTime
 }
 
 """
 An edge in a connection.
 """
-type PostEdge {
+type SurveyEdge {
   """
   The item at the end of the edge.
   """
-  node: Post!
+  node: Survey!
   """
   A cursor for use in pagination.
   """
   cursor: String!
 }
 
-enum PostOrderByInput {
+enum SurveyOrderByInput {
   id_ASC
   id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
   isPublished_ASC
   isPublished_DESC
   title_ASC
   title_DESC
-  text_ASC
-  text_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
+  description_ASC
+  description_DESC
+  endDate_ASC
+  endDate_DESC
 }
 
-type PostPreviousValues {
+type SurveyPreviousValues {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  text: String!
+  description: String!
+  endDate: DateTime
 }
 
-type PostSubscriptionPayload {
+type SurveySubscriptionPayload {
   mutation: MutationType!
-  node: Post
+  node: Survey
   updatedFields: [String!]
-  previousValues: PostPreviousValues
+  previousValues: SurveyPreviousValues
 }
 
-input PostSubscriptionWhereInput {
+input SurveySubscriptionWhereInput {
   """
   Logical AND on all given filters.
   """
-  AND: [PostSubscriptionWhereInput!]
+  AND: [SurveySubscriptionWhereInput!]
   """
   Logical OR on all given filters.
   """
-  OR: [PostSubscriptionWhereInput!]
+  OR: [SurveySubscriptionWhereInput!]
   """
   The subscription event gets dispatched when it's listed in mutation_in
   """
@@ -170,24 +233,46 @@ input PostSubscriptionWhereInput {
   The subscription event gets only dispatched when some of the field names included in this list have been updated
   """
   updatedFields_contains_some: [String!]
-  node: PostWhereInput
+  node: SurveyWhereInput
 }
 
-input PostUpdateInput {
+input SurveyUpdateInput {
   isPublished: Boolean
   title: String
-  text: String
+  description: String
+  endDate: DateTime
+  votes: VoteUpdateManyWithoutSurveyInput
 }
 
-input PostWhereInput {
+input SurveyUpdateOneWithoutVotesInput {
+  create: SurveyCreateWithoutVotesInput
+  connect: SurveyWhereUniqueInput
+  delete: Boolean
+  update: SurveyUpdateWithoutVotesDataInput
+  upsert: SurveyUpsertWithoutVotesInput
+}
+
+input SurveyUpdateWithoutVotesDataInput {
+  isPublished: Boolean
+  title: String
+  description: String
+  endDate: DateTime
+}
+
+input SurveyUpsertWithoutVotesInput {
+  update: SurveyUpdateWithoutVotesDataInput!
+  create: SurveyCreateWithoutVotesInput!
+}
+
+input SurveyWhereInput {
   """
   Logical AND on all given filters.
   """
-  AND: [PostWhereInput!]
+  AND: [SurveyWhereInput!]
   """
   Logical OR on all given filters.
   """
-  OR: [PostWhereInput!]
+  OR: [SurveyWhereInput!]
   id: ID
   """
   All values that are not equal to given value.
@@ -241,6 +326,64 @@ input PostWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
   isPublished: Boolean
   """
   All values that are not equal to given value.
@@ -299,78 +442,317 @@ input PostWhereInput {
   All values not ending with the given string.
   """
   title_not_ends_with: String
-  text: String
+  description: String
   """
   All values that are not equal to given value.
   """
-  text_not: String
+  description_not: String
   """
   All values that are contained in given list.
   """
-  text_in: [String!]
+  description_in: [String!]
   """
   All values that are not contained in given list.
   """
-  text_not_in: [String!]
+  description_not_in: [String!]
   """
   All values less than the given value.
   """
-  text_lt: String
+  description_lt: String
   """
   All values less than or equal the given value.
   """
-  text_lte: String
+  description_lte: String
   """
   All values greater than the given value.
   """
-  text_gt: String
+  description_gt: String
   """
   All values greater than or equal the given value.
   """
-  text_gte: String
+  description_gte: String
   """
   All values containing the given string.
   """
-  text_contains: String
+  description_contains: String
   """
   All values not containing the given string.
   """
-  text_not_contains: String
+  description_not_contains: String
   """
   All values starting with the given string.
   """
-  text_starts_with: String
+  description_starts_with: String
   """
   All values not starting with the given string.
   """
-  text_not_starts_with: String
+  description_not_starts_with: String
   """
   All values ending with the given string.
   """
-  text_ends_with: String
+  description_ends_with: String
   """
   All values not ending with the given string.
   """
-  text_not_ends_with: String
+  description_not_ends_with: String
+  endDate: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  endDate_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  endDate_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  endDate_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  endDate_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  endDate_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  endDate_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  endDate_gte: DateTime
+  votes_every: VoteWhereInput
+  votes_some: VoteWhereInput
+  votes_none: VoteWhereInput
 }
 
-input PostWhereUniqueInput {
+input SurveyWhereUniqueInput {
   id: ID
 }
 
-type Query {
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
-  post(where: PostWhereUniqueInput!): Post
-  postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+"""
+A connection to a list of items.
+"""
+type VoteConnection {
   """
-  Fetches an object given its ID
+  Information to aid in pagination.
   """
-  node("""
-  The ID of an object
+  pageInfo: PageInfo!
   """
-  id: ID!): Node
+  A list of edges.
+  """
+  edges: [VoteEdge]!
+  aggregate: AggregateVote!
 }
 
-type Subscription {
-  post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+input VoteCreateInput {
+  survey: SurveyCreateOneWithoutVotesInput!
+}
+
+input VoteCreateManyWithoutSurveyInput {
+  connect: [VoteWhereUniqueInput!]
+}
+
+"""
+An edge in a connection.
+"""
+type VoteEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Vote!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum VoteOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type VotePreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type VoteSubscriptionPayload {
+  mutation: MutationType!
+  node: Vote
+  updatedFields: [String!]
+  previousValues: VotePreviousValues
+}
+
+input VoteSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [VoteSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [VoteSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: VoteWhereInput
+}
+
+input VoteUpdateInput {
+  survey: SurveyUpdateOneWithoutVotesInput
+}
+
+input VoteUpdateManyWithoutSurveyInput {
+  connect: [VoteWhereUniqueInput!]
+  disconnect: [VoteWhereUniqueInput!]
+  delete: [VoteWhereUniqueInput!]
+}
+
+input VoteWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [VoteWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [VoteWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  survey: SurveyWhereInput
+}
+
+input VoteWhereUniqueInput {
+  id: ID
 }

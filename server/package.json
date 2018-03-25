@@ -1,5 +1,5 @@
 {
-  "name": "nps-collector",
+  "name": "apollo-nps-collector",
   "scripts": {
     "start": "node src/index.js",
     "playground": "prisma playground",
@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "graphql-yoga": "1.6.1",
+    "npm": "^5.8.0",
     "prisma-binding": "1.5.16"
   },
   "devDependencies": {

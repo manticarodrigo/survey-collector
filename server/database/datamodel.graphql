@@ -1,6 +1,17 @@
-type Post {
+type Survey {
   id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  text: String!
+  description: String!
+  endDate: DateTime
+  votes: [Vote!]! @relation(name: "SurveyVotes")
+}
+
+type Vote {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  survey: Survey! @relation(name: "SurveyVotes")
 }

@@ -20,17 +20,28 @@ const resolvers = {
         info,
       )
     },
-    deletePost(parent, { id }, ctx, info) {
-      return ctx.db.mutation.deletePost({where: { id } }, info)
+    deleteSurvey(parent, { id }, ctx, info) {
+      return ctx.db.mutation.deleteSurvey({where: { id } }, info)
     },
     publish(parent, { id }, ctx, info) {
-      return ctx.db.mutation.updatePost(
+      return ctx.db.mutation.updateSurvey(
         {
           where: { id },
           data: { isPublished: true },
         },
         info,
       )
+    },
+    createVote(parent, { surveyId }, ctx, info) {
+      return ctx.db.mutation.createVote({
+        data: {
+          survey: {
+            connect: {
+              id: surveyId
+            }
+          },
+        },
+      })
     },
   },
 }
@@ -42,7 +53,7 @@ const server = new GraphQLServer({
     ...req,
     db: new Prisma({
       typeDefs: 'src/generated/prisma.graphql',
-      endpoint: 'http://localhost:4466/my-react-basic/dev',
+      endpoint: 'http://localhost:4466/apollo-nps-collector/dev',
       secret: 'mysecret123',
       debug: true,
     }),

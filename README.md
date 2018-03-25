@@ -1,4 +1,4 @@
-## NPS Collector
+## Apollo NPS Collector
 
 Deployment steps:
   1. Change directory: `cd nps-collector/server`
