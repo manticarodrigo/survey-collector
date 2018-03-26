@@ -8,10 +8,13 @@ export default class Survey extends Component {
       title = `${title} (Draft)`
     }
     var totalRatings = 0
-    this.props.survey.ratings.forEach(rating => {
-      totalRatings += rating.rating
-    })
-    let avgRating = Math.round(totalRatings/this.props.survey.ratings.length)
+    var avgRating = null
+    if (this.props.survey.ratings) {
+      this.props.survey.ratings.forEach(rating => {
+        totalRatings += rating.rating
+      })
+      avgRating = Math.round(totalRatings/this.props.survey.ratings.length)
+    }
     let npsMap = {
       0:'Detractor',
       1:'Detractor',
