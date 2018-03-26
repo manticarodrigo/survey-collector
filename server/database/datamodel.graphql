@@ -4,7 +4,7 @@ type Survey {
   updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  description: String!
+  text: String!
   endDate: DateTime
   votes: [Vote!]! @relation(name: "SurveyVotes")
 }
@@ -13,5 +13,6 @@ type Vote {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
+  rating: Int!
   survey: Survey! @relation(name: "SurveyVotes")
 }

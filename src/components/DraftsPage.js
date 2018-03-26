@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import Post from '../components/Post'
+import Survey from '../components/Survey'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -30,9 +30,9 @@ export default class DraftsPage extends Component {
               </div>
               {data.drafts &&
                 data.drafts.map(draft => (
-                  <Post
+                  <Survey
                     key={draft.id}
-                    post={draft}
+                    survey={draft}
                     refresh={() => refetch()}
                     isDraft={!draft.isPublished}
                   />

@@ -11,7 +11,7 @@ type Survey implements Node {
   updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  description: String!
+  text: String!
   endDate: DateTime
   votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote!]
 }
@@ -20,6 +20,7 @@ type Vote implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  rating: Int!
   survey(where: SurveyWhereInput): Survey!
 }
 
@@ -143,7 +144,7 @@ type SurveyConnection {
 input SurveyCreateInput {
   isPublished: Boolean!
   title: String!
-  description: String!
+  text: String!
   endDate: DateTime
   votes: VoteCreateManyWithoutSurveyInput
 }
@@ -156,7 +157,7 @@ input SurveyCreateOneWithoutVotesInput {
 input SurveyCreateWithoutVotesInput {
   isPublished: Boolean!
   title: String!
-  description: String!
+  text: String!
   endDate: DateTime
 }
 
@@ -185,8 +186,8 @@ enum SurveyOrderByInput {
   isPublished_DESC
   title_ASC
   title_DESC
-  description_ASC
-  description_DESC
+  text_ASC
+  text_DESC
   endDate_ASC
   endDate_DESC
 }
@@ -197,7 +198,7 @@ type SurveyPreviousValues {
   updatedAt: DateTime!
   isPublished: Boolean!
   title: String!
-  description: String!
+  text: String!
   endDate: DateTime
 }
 
@@ -239,7 +240,7 @@ input SurveySubscriptionWhereInput {
 input SurveyUpdateInput {
   isPublished: Boolean
   title: String
-  description: String
+  text: String
   endDate: DateTime
   votes: VoteUpdateManyWithoutSurveyInput
 }
@@ -255,7 +256,7 @@ input SurveyUpdateOneWithoutVotesInput {
 input SurveyUpdateWithoutVotesDataInput {
   isPublished: Boolean
   title: String
-  description: String
+  text: String
   endDate: DateTime
 }
 
@@ -442,59 +443,59 @@ input SurveyWhereInput {
   All values not ending with the given string.
   """
   title_not_ends_with: String
-  description: String
+  text: String
   """
   All values that are not equal to given value.
   """
-  description_not: String
+  text_not: String
   """
   All values that are contained in given list.
   """
-  description_in: [String!]
+  text_in: [String!]
   """
   All values that are not contained in given list.
   """
-  description_not_in: [String!]
+  text_not_in: [String!]
   """
   All values less than the given value.
   """
-  description_lt: String
+  text_lt: String
   """
   All values less than or equal the given value.
   """
-  description_lte: String
+  text_lte: String
   """
   All values greater than the given value.
   """
-  description_gt: String
+  text_gt: String
   """
   All values greater than or equal the given value.
   """
-  description_gte: String
+  text_gte: String
   """
   All values containing the given string.
   """
-  description_contains: String
+  text_contains: String
   """
   All values not containing the given string.
   """
-  description_not_contains: String
+  text_not_contains: String
   """
   All values starting with the given string.
   """
-  description_starts_with: String
+  text_starts_with: String
   """
   All values not starting with the given string.
   """
-  description_not_starts_with: String
+  text_not_starts_with: String
   """
   All values ending with the given string.
   """
-  description_ends_with: String
+  text_ends_with: String
   """
   All values not ending with the given string.
   """
-  description_not_ends_with: String
+  text_not_ends_with: String
   endDate: DateTime
   """
   All values that are not equal to given value.
@@ -549,11 +550,17 @@ type VoteConnection {
 }
 
 input VoteCreateInput {
+  rating: Int!
   survey: SurveyCreateOneWithoutVotesInput!
 }
 
 input VoteCreateManyWithoutSurveyInput {
+  create: [VoteCreateWithoutSurveyInput!]
   connect: [VoteWhereUniqueInput!]
+}
+
+input VoteCreateWithoutSurveyInput {
+  rating: Int!
 }
 
 """
@@ -577,12 +584,15 @@ enum VoteOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  rating_ASC
+  rating_DESC
 }
 
 type VotePreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  rating: Int!
 }
 
 type VoteSubscriptionPayload {
@@ -621,13 +631,32 @@ input VoteSubscriptionWhereInput {
 }
 
 input VoteUpdateInput {
+  rating: Int
   survey: SurveyUpdateOneWithoutVotesInput
 }
 
 input VoteUpdateManyWithoutSurveyInput {
+  create: [VoteCreateWithoutSurveyInput!]
   connect: [VoteWhereUniqueInput!]
   disconnect: [VoteWhereUniqueInput!]
   delete: [VoteWhereUniqueInput!]
+  update: [VoteUpdateWithWhereUniqueWithoutSurveyInput!]
+  upsert: [VoteUpsertWithWhereUniqueWithoutSurveyInput!]
+}
+
+input VoteUpdateWithoutSurveyDataInput {
+  rating: Int
+}
+
+input VoteUpdateWithWhereUniqueWithoutSurveyInput {
+  where: VoteWhereUniqueInput!
+  data: VoteUpdateWithoutSurveyDataInput!
+}
+
+input VoteUpsertWithWhereUniqueWithoutSurveyInput {
+  where: VoteWhereUniqueInput!
+  update: VoteUpdateWithoutSurveyDataInput!
+  create: VoteCreateWithoutSurveyInput!
 }
 
 input VoteWhereInput {
@@ -750,6 +779,35 @@ input VoteWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
+  rating: Int
+  """
+  All values that are not equal to given value.
+  """
+  rating_not: Int
+  """
+  All values that are contained in given list.
+  """
+  rating_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  rating_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  rating_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  rating_lte: Int
+  """
+  All values greater than the given value.
+  """
+  rating_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  rating_gte: Int
   survey: SurveyWhereInput
 }
 

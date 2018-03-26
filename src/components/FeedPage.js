@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import Post from '../components/Post'
+import Survey from '../components/Survey'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 
@@ -28,12 +28,12 @@ export default class FeedPage extends Component {
             <Fragment>
               <h1>Feed</h1>
               {data.feed &&
-                data.feed.map(post => (
-                  <Post
-                    key={post.id}
-                    post={post}
+                data.feed.map(survey => (
+                  <Survey
+                    key={survey.id}
+                    post={survey}
                     refresh={() => refetch()}
-                    isDraft={!post.isPublished}
+                    isDraft={!survey.isPublished}
                   />
                 ))}
               {this.props.children}

@@ -1,13 +1,14 @@
-# import Post from "./generated/prisma.graphql"
+# import Survey, Vote from "./generated/prisma.graphql"
 
 type Query {
-  feed: [Post!]!
-  drafts: [Post!]!
-  post(id: ID!): Post
+  feed: [Survey!]!
+  drafts: [Survey!]!
+  survey(id: ID!): Survey
 }
 
 type Mutation {
-  createDraft(title: String!, text: String): Post
-  deletePost(id: ID!): Post
-  publish(id: ID!): Post
+  createDraft(title: String!, text: String): Survey
+  deleteSurvey(id: ID!): Survey
+  publish(id: ID!): Survey
+  createVote(surveyId: ID!): Vote
 }

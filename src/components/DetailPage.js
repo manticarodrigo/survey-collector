@@ -8,7 +8,7 @@ import { FEED_QUERY } from './FeedPage'
 class DetailPage extends Component {
   render() {
     return (
-      <Query query={POST_QUERY} variables={{ id: this.props.match.params.id }}>
+      <Query query={SURVEY_QUERY} variables={{ id: this.props.match.params.id }}>
         {({ data, loading, error }) => {
           if (loading) {
             return (
@@ -26,12 +26,12 @@ class DetailPage extends Component {
             )
           }
 
-          const { post } = data
-          const action = this._renderAction(post)
+          const { survey } = data
+          const action = this._renderAction(survey)
           return (
             <Fragment>
-              <h1 className="f3 black-80 fw4 lh-solid">{data.post.title}</h1>
-              <p className="black-80 fw3">{data.post.text}</p>
+              <h1 className="f3 black-80 fw4 lh-solid">{data.survey.title}</h1>
+              <p className="black-80 fw3">{data.survey.text}</p>
               {action}
             </Fragment>
           )
@@ -85,7 +85,7 @@ class DetailPage extends Component {
             cache.writeQuery({
               query: FEED_QUERY,
               data: {
-                feed: feed.filter(post => post.id !== data.deletePost.id),
+                feed: feed.filter(survey => survey.id !== data.deleteSurvey.id),
               },
             })
           } else {
@@ -93,18 +93,18 @@ class DetailPage extends Component {
             cache.writeQuery({
               query: DRAFTS_QUERY,
               data: {
-                drafts: drafts.filter(draft => draft.id !== data.deletePost.id),
+                drafts: drafts.filter(draft => draft.id !== data.deleteSurvey.id),
               },
             })
           }
         }}
       >
-        {(deletePost, { data, loading, error }) => {
+        {(deleteSurvey, { data, loading, error }) => {
           return (
             <a
               className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
               onClick={async () => {
-                await deletePost({
+                await deleteSurvey({
                   variables: { id },
                 })
                 this.props.history.replace('/')
@@ -127,8 +127,8 @@ class DetailPage extends Component {
     return deleteMutation
   }
 
-  deletePost = async id => {
-    await this.props.deletePost({
+  deleteSurvey = async id => {
+    await this.props.deleteSurvey({
       variables: { id },
     })
     this.props.history.replace('/')
@@ -142,12 +142,12 @@ class DetailPage extends Component {
   }
 }
 
-const POST_QUERY = gql`
-  query PostQuery($id: ID!) {
-    post(id: $id) {
+const SURVEY_QUERY = gql`
+  query SurveyQuery($id: ID!) {
+    survey(id: $id) {
       id
       title
-      text
+      description
       isPublished
     }
   }
@@ -163,8 +163,8 @@ const PUBLISH_MUTATION = gql`
 `
 
 const DELETE_MUTATION = gql`
-  mutation deletePost($id: ID!) {
-    deletePost(id: $id) {
+  mutation deleteSurvey($id: ID!) {
+    deleteSurvey(id: $id) {
       id
     }
   }

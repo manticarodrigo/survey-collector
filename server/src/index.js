@@ -9,7 +9,7 @@ const resolvers = {
     drafts(parent, args, ctx, info) {
       return ctx.db.query.surveys({ where: { isPublished: false } }, info)
     },
-    survet(parent, { id }, ctx, info) {
+    survey(parent, { id }, ctx, info) {
       return ctx.db.query.surveys({ where: { id: id } }, info)
     },
   },
