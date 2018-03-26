@@ -5,6 +5,14 @@
 # Model Types
 #
 
+type Rating implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  rating: Int!
+  survey(where: SurveyWhereInput): Survey!
+}
+
 type Survey implements Node {
   id: ID!
   createdAt: DateTime!
@@ -13,15 +21,7 @@ type Survey implements Node {
   title: String!
   text: String!
   endDate: DateTime
-  votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote!]
-}
-
-type Vote implements Node {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  rating: Int!
-  survey(where: SurveyWhereInput): Survey!
+  ratings(where: RatingWhereInput, orderBy: RatingOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Rating!]
 }
 
 
@@ -29,11 +29,11 @@ type Vote implements Node {
 # Other Types
 #
 
-type AggregateSurvey {
+type AggregateRating {
   count: Int!
 }
 
-type AggregateVote {
+type AggregateSurvey {
   count: Int!
 }
 
@@ -54,17 +54,17 @@ scalar Long
 
 type Mutation {
   createSurvey(data: SurveyCreateInput!): Survey!
-  createVote(data: VoteCreateInput!): Vote!
+  createRating(data: RatingCreateInput!): Rating!
   updateSurvey(data: SurveyUpdateInput!, where: SurveyWhereUniqueInput!): Survey
-  updateVote(data: VoteUpdateInput!, where: VoteWhereUniqueInput!): Vote
+  updateRating(data: RatingUpdateInput!, where: RatingWhereUniqueInput!): Rating
   deleteSurvey(where: SurveyWhereUniqueInput!): Survey
-  deleteVote(where: VoteWhereUniqueInput!): Vote
+  deleteRating(where: RatingWhereUniqueInput!): Rating
   upsertSurvey(where: SurveyWhereUniqueInput!, create: SurveyCreateInput!, update: SurveyUpdateInput!): Survey!
-  upsertVote(where: VoteWhereUniqueInput!, create: VoteCreateInput!, update: VoteUpdateInput!): Vote!
+  upsertRating(where: RatingWhereUniqueInput!, create: RatingCreateInput!, update: RatingUpdateInput!): Rating!
   updateManySurveys(data: SurveyUpdateInput!, where: SurveyWhereInput!): BatchPayload!
-  updateManyVotes(data: VoteUpdateInput!, where: VoteWhereInput!): BatchPayload!
+  updateManyRatings(data: RatingUpdateInput!, where: RatingWhereInput!): BatchPayload!
   deleteManySurveys(where: SurveyWhereInput!): BatchPayload!
-  deleteManyVotes(where: VoteWhereInput!): BatchPayload!
+  deleteManyRatings(where: RatingWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -107,11 +107,11 @@ type PageInfo {
 
 type Query {
   surveys(where: SurveyWhereInput, orderBy: SurveyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Survey]!
-  votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote]!
+  ratings(where: RatingWhereInput, orderBy: RatingOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Rating]!
   survey(where: SurveyWhereUniqueInput!): Survey
-  vote(where: VoteWhereUniqueInput!): Vote
+  rating(where: RatingWhereUniqueInput!): Rating
   surveysConnection(where: SurveyWhereInput, orderBy: SurveyOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): SurveyConnection!
-  votesConnection(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VoteConnection!
+  ratingsConnection(where: RatingWhereInput, orderBy: RatingOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RatingConnection!
   """
   Fetches an object given its ID
   """
@@ -121,9 +121,290 @@ type Query {
   id: ID!): Node
 }
 
+"""
+A connection to a list of items.
+"""
+type RatingConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [RatingEdge]!
+  aggregate: AggregateRating!
+}
+
+input RatingCreateInput {
+  rating: Int!
+  survey: SurveyCreateOneWithoutRatingsInput!
+}
+
+input RatingCreateManyWithoutSurveyInput {
+  create: [RatingCreateWithoutSurveyInput!]
+  connect: [RatingWhereUniqueInput!]
+}
+
+input RatingCreateWithoutSurveyInput {
+  rating: Int!
+}
+
+"""
+An edge in a connection.
+"""
+type RatingEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Rating!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum RatingOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  rating_ASC
+  rating_DESC
+}
+
+type RatingPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  rating: Int!
+}
+
+type RatingSubscriptionPayload {
+  mutation: MutationType!
+  node: Rating
+  updatedFields: [String!]
+  previousValues: RatingPreviousValues
+}
+
+input RatingSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [RatingSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [RatingSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: RatingWhereInput
+}
+
+input RatingUpdateInput {
+  rating: Int
+  survey: SurveyUpdateOneWithoutRatingsInput
+}
+
+input RatingUpdateManyWithoutSurveyInput {
+  create: [RatingCreateWithoutSurveyInput!]
+  connect: [RatingWhereUniqueInput!]
+  disconnect: [RatingWhereUniqueInput!]
+  delete: [RatingWhereUniqueInput!]
+  update: [RatingUpdateWithWhereUniqueWithoutSurveyInput!]
+  upsert: [RatingUpsertWithWhereUniqueWithoutSurveyInput!]
+}
+
+input RatingUpdateWithoutSurveyDataInput {
+  rating: Int
+}
+
+input RatingUpdateWithWhereUniqueWithoutSurveyInput {
+  where: RatingWhereUniqueInput!
+  data: RatingUpdateWithoutSurveyDataInput!
+}
+
+input RatingUpsertWithWhereUniqueWithoutSurveyInput {
+  where: RatingWhereUniqueInput!
+  update: RatingUpdateWithoutSurveyDataInput!
+  create: RatingCreateWithoutSurveyInput!
+}
+
+input RatingWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [RatingWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [RatingWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  rating: Int
+  """
+  All values that are not equal to given value.
+  """
+  rating_not: Int
+  """
+  All values that are contained in given list.
+  """
+  rating_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
+  rating_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
+  rating_lt: Int
+  """
+  All values less than or equal the given value.
+  """
+  rating_lte: Int
+  """
+  All values greater than the given value.
+  """
+  rating_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
+  rating_gte: Int
+  survey: SurveyWhereInput
+}
+
+input RatingWhereUniqueInput {
+  id: ID
+}
+
 type Subscription {
   survey(where: SurveySubscriptionWhereInput): SurveySubscriptionPayload
-  vote(where: VoteSubscriptionWhereInput): VoteSubscriptionPayload
+  rating(where: RatingSubscriptionWhereInput): RatingSubscriptionPayload
 }
 
 """
@@ -146,15 +427,15 @@ input SurveyCreateInput {
   title: String!
   text: String!
   endDate: DateTime
-  votes: VoteCreateManyWithoutSurveyInput
+  ratings: RatingCreateManyWithoutSurveyInput
 }
 
-input SurveyCreateOneWithoutVotesInput {
-  create: SurveyCreateWithoutVotesInput
+input SurveyCreateOneWithoutRatingsInput {
+  create: SurveyCreateWithoutRatingsInput
   connect: SurveyWhereUniqueInput
 }
 
-input SurveyCreateWithoutVotesInput {
+input SurveyCreateWithoutRatingsInput {
   isPublished: Boolean!
   title: String!
   text: String!
@@ -242,27 +523,27 @@ input SurveyUpdateInput {
   title: String
   text: String
   endDate: DateTime
-  votes: VoteUpdateManyWithoutSurveyInput
+  ratings: RatingUpdateManyWithoutSurveyInput
 }
 
-input SurveyUpdateOneWithoutVotesInput {
-  create: SurveyCreateWithoutVotesInput
+input SurveyUpdateOneWithoutRatingsInput {
+  create: SurveyCreateWithoutRatingsInput
   connect: SurveyWhereUniqueInput
   delete: Boolean
-  update: SurveyUpdateWithoutVotesDataInput
-  upsert: SurveyUpsertWithoutVotesInput
+  update: SurveyUpdateWithoutRatingsDataInput
+  upsert: SurveyUpsertWithoutRatingsInput
 }
 
-input SurveyUpdateWithoutVotesDataInput {
+input SurveyUpdateWithoutRatingsDataInput {
   isPublished: Boolean
   title: String
   text: String
   endDate: DateTime
 }
 
-input SurveyUpsertWithoutVotesInput {
-  update: SurveyUpdateWithoutVotesDataInput!
-  create: SurveyCreateWithoutVotesInput!
+input SurveyUpsertWithoutRatingsInput {
+  update: SurveyUpdateWithoutRatingsDataInput!
+  create: SurveyCreateWithoutRatingsInput!
 }
 
 input SurveyWhereInput {
@@ -525,292 +806,11 @@ input SurveyWhereInput {
   All values greater than or equal the given value.
   """
   endDate_gte: DateTime
-  votes_every: VoteWhereInput
-  votes_some: VoteWhereInput
-  votes_none: VoteWhereInput
+  ratings_every: RatingWhereInput
+  ratings_some: RatingWhereInput
+  ratings_none: RatingWhereInput
 }
 
 input SurveyWhereUniqueInput {
-  id: ID
-}
-
-"""
-A connection to a list of items.
-"""
-type VoteConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [VoteEdge]!
-  aggregate: AggregateVote!
-}
-
-input VoteCreateInput {
-  rating: Int!
-  survey: SurveyCreateOneWithoutVotesInput!
-}
-
-input VoteCreateManyWithoutSurveyInput {
-  create: [VoteCreateWithoutSurveyInput!]
-  connect: [VoteWhereUniqueInput!]
-}
-
-input VoteCreateWithoutSurveyInput {
-  rating: Int!
-}
-
-"""
-An edge in a connection.
-"""
-type VoteEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Vote!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum VoteOrderByInput {
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  rating_ASC
-  rating_DESC
-}
-
-type VotePreviousValues {
-  id: ID!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  rating: Int!
-}
-
-type VoteSubscriptionPayload {
-  mutation: MutationType!
-  node: Vote
-  updatedFields: [String!]
-  previousValues: VotePreviousValues
-}
-
-input VoteSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [VoteSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [VoteSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: VoteWhereInput
-}
-
-input VoteUpdateInput {
-  rating: Int
-  survey: SurveyUpdateOneWithoutVotesInput
-}
-
-input VoteUpdateManyWithoutSurveyInput {
-  create: [VoteCreateWithoutSurveyInput!]
-  connect: [VoteWhereUniqueInput!]
-  disconnect: [VoteWhereUniqueInput!]
-  delete: [VoteWhereUniqueInput!]
-  update: [VoteUpdateWithWhereUniqueWithoutSurveyInput!]
-  upsert: [VoteUpsertWithWhereUniqueWithoutSurveyInput!]
-}
-
-input VoteUpdateWithoutSurveyDataInput {
-  rating: Int
-}
-
-input VoteUpdateWithWhereUniqueWithoutSurveyInput {
-  where: VoteWhereUniqueInput!
-  data: VoteUpdateWithoutSurveyDataInput!
-}
-
-input VoteUpsertWithWhereUniqueWithoutSurveyInput {
-  where: VoteWhereUniqueInput!
-  update: VoteUpdateWithoutSurveyDataInput!
-  create: VoteCreateWithoutSurveyInput!
-}
-
-input VoteWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [VoteWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [VoteWhereInput!]
-  id: ID
-  """
-  All values that are not equal to given value.
-  """
-  id_not: ID
-  """
-  All values that are contained in given list.
-  """
-  id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
-  id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
-  id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
-  id_lte: ID
-  """
-  All values greater than the given value.
-  """
-  id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  updatedAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  updatedAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  updatedAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  updatedAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  updatedAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  updatedAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  updatedAt_gte: DateTime
-  rating: Int
-  """
-  All values that are not equal to given value.
-  """
-  rating_not: Int
-  """
-  All values that are contained in given list.
-  """
-  rating_in: [Int!]
-  """
-  All values that are not contained in given list.
-  """
-  rating_not_in: [Int!]
-  """
-  All values less than the given value.
-  """
-  rating_lt: Int
-  """
-  All values less than or equal the given value.
-  """
-  rating_lte: Int
-  """
-  All values greater than the given value.
-  """
-  rating_gt: Int
-  """
-  All values greater than or equal the given value.
-  """
-  rating_gte: Int
-  survey: SurveyWhereInput
-}
-
-input VoteWhereUniqueInput {
   id: ID
 }

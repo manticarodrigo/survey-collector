@@ -50,8 +50,8 @@ export const DRAFTS_QUERY = gql`
   query DraftsQuery {
     drafts {
       id
-      text
       title
+      text
       isPublished
     }
   }

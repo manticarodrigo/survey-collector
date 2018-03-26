@@ -28,11 +28,20 @@ class DetailPage extends Component {
 
           const { survey } = data
           const action = this._renderAction(survey)
+          console.log(survey)
           return (
             <Fragment>
               <h1 className="f3 black-80 fw4 lh-solid">{data.survey.title}</h1>
               <p className="black-80 fw3">{data.survey.text}</p>
               {action}
+              {survey.isPublished &&
+                <div style={{backgroundColor:'#fff', padding:'1em', borderRadius:'4px'}}>
+                  Rating History:
+                  {survey.ratings.map(rating => {
+                    return <p key={rating.id}>Time: {rating.createdAt} Rating: {rating.rating}</p>
+                  })}
+                </div>
+              }
             </Fragment>
           )
         }}
@@ -116,6 +125,30 @@ class DetailPage extends Component {
         }}
       </Mutation>
     )
+    const rateMutation = (
+      <Mutation
+        mutation={RATE_MUTATION}
+        refetchQueries={[{query: FEED_QUERY}]}
+      >
+        {(rate, { data, loading, error }) => {
+          const n = 11; // 0-10 rating
+          return [...Array(n)].map((e, i) =>
+            <span 
+              className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer" 
+              key={i}
+              onClick={async () => {
+                await rate({
+                  variables: { id: id, rating: i },
+                })
+                this.props.history.replace('/')
+              }}
+            >
+              {i}
+            </span>
+          )
+        }}
+      </Mutation>
+    )
     if (!isPublished) {
       return (
         <Fragment>
@@ -124,7 +157,14 @@ class DetailPage extends Component {
         </Fragment>
       )
     }
-    return deleteMutation
+    return (
+      <Fragment>
+        <p>Submit Rating:</p>
+        {rateMutation}
+        <br />
+        {deleteMutation}
+      </Fragment>
+    )
   }
 
   deleteSurvey = async id => {
@@ -147,8 +187,13 @@ const SURVEY_QUERY = gql`
     survey(id: $id) {
       id
       title
-      description
+      text
       isPublished
+      ratings {
+        id
+        rating
+        createdAt
+      }
     }
   }
 `
@@ -165,6 +210,14 @@ const PUBLISH_MUTATION = gql`
 const DELETE_MUTATION = gql`
   mutation deleteSurvey($id: ID!) {
     deleteSurvey(id: $id) {
+      id
+    }
+  }
+`
+
+const RATE_MUTATION = gql`
+  mutation rate($id: ID!, $rating: Int!) {
+    rate(id: $id, rating: $rating) {
       id
     }
   }

@@ -10,7 +10,7 @@ const resolvers = {
       return ctx.db.query.surveys({ where: { isPublished: false } }, info)
     },
     survey(parent, { id }, ctx, info) {
-      return ctx.db.query.surveys({ where: { id: id } }, info)
+      return ctx.db.query.survey({ where: { id: id } }, info)
     },
   },
   Mutation: {
@@ -32,16 +32,20 @@ const resolvers = {
         info,
       )
     },
-    createVote(parent, { surveyId }, ctx, info) {
-      return ctx.db.mutation.createVote({
-        data: {
-          survey: {
-            connect: {
-              id: surveyId
-            }
+    rate(parent, { id, rating }, ctx, info) {
+      return ctx.db.mutation.createRating(
+        {
+          data: {
+            survey: {
+              connect: {
+                id: id
+              }
+            },
+            rating,
           },
         },
-      })
+        info,
+      )
     },
   },
 }

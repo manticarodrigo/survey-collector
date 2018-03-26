@@ -26,12 +26,12 @@ export default class FeedPage extends Component {
 
           return (
             <Fragment>
-              <h1>Feed</h1>
+              <h1>Survey Feed</h1>
               {data.feed &&
                 data.feed.map(survey => (
                   <Survey
                     key={survey.id}
-                    post={survey}
+                    survey={survey}
                     refresh={() => refetch()}
                     isDraft={!survey.isPublished}
                   />
@@ -49,9 +49,13 @@ export const FEED_QUERY = gql`
   query FeedQuery {
     feed {
       id
-      text
       title
+      text
       isPublished
+      ratings {
+        id
+        rating
+      }
     }
   }
 `

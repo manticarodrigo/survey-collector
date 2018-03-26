@@ -6,13 +6,13 @@ type Survey {
   title: String!
   text: String!
   endDate: DateTime
-  votes: [Vote!]! @relation(name: "SurveyVotes")
+  ratings: [Rating!]! @relation(name: "SurveyRatings")
 }
 
-type Vote {
+type Rating {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
   rating: Int!
-  survey: Survey! @relation(name: "SurveyVotes")
+  survey: Survey! @relation(name: "SurveyRatings")
 }

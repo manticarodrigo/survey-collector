@@ -1,4 +1,4 @@
-# import Survey, Vote from "./generated/prisma.graphql"
+# import Survey, Rating from "./generated/prisma.graphql"
 
 type Query {
   feed: [Survey!]!
@@ -10,5 +10,5 @@ type Mutation {
   createDraft(title: String!, text: String): Survey
   deleteSurvey(id: ID!): Survey
   publish(id: ID!): Survey
-  createVote(surveyId: ID!): Vote
+  rate(id: ID!, rating: Int!): Rating
 }
