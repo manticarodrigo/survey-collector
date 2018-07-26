@@ -1,4 +1,6 @@
-## Apollo NPS Collector
+## Survey Collector
+
+Packages & Frameworks: `React.js, Node.js, Apollo, Prisma`
 
 This app allows you to create surveys with an NPS rating system. Create a draft, publish it, and begin submitting ratings. You can see the rating history in the survey detail page (click on a survey in the survey feed page).
 
