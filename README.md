@@ -9,7 +9,7 @@ Installation steps:
   2. Deploy prisma to docker: `prisma deploy`
 
 Deployment steps:
-  1. Change directory: `cd nps-collector/server`
+  1. Change directory: `cd survey-collector/server`
   2. Start local server: `yarn start` (you can now open a Playground at http://localhost:4000)
   3. Change directory: `cd ..`
   4. Start React app: `yarn start`
